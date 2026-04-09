@@ -1,111 +1,106 @@
-markdown
+# NUST Admission Assistant
 
-# nust-admission-assistant
-
-A fully offline RAG-based chatbot that answers NUST admissions questions using verified FAQ data. No internet required at runtime.
-
-![UI Screenshot](screenshot.png)
+**A fully offline, RAG-based chatbot for answering NUST admissions questions - powered entirely by official FAQ data.**  
 
 ---
 
-## What it does
+## 🚀 Overview
 
-Students ask questions about NUST admissions — NET, eligibility, scholarships, hostels, programmes — and the bot answers strictly from NUST's official FAQ data. No hallucinations, no cloud, no internet.
+**NUST Admission Assistant** allows students to get instant, accurate answers about:
 
----
+- NET & admission procedures  
+- Eligibility criteria  
+- Scholarships & financial aid  
+- Hostels & accommodation  
+- Programmes & course details  
 
-## How it works
-
-**Retrieval-Augmented Generation (RAG) pipeline:**
-
-1. Student types a question
-2. Question is embedded into a semantic vector
-3. FAISS searches an offline index for the 3 most relevant FAQ chunks
-4. Chunks are passed to a local LLM (`qwen2.5:1.5b`) as context
-5. LLM generates a grounded answer — strictly from FAQ data
+All answers are **grounded in NUST's official FAQ data** — no internet, no cloud, no hallucinations.  
 
 ---
 
-## Project structure
+## 💡 How It Works
 
-```
+This project uses a **Retrieval-Augmented Generation (RAG)** pipeline:
+
+1. Student asks a question in the chat.  
+2. The question is embedded into a semantic vector.  
+3. **FAISS** searches the offline index for the 3 most relevant FAQ chunks.  
+4. These chunks are provided to a **local LLM (`qwen2.5:1.5b`)** as context.  
+5. The LLM generates a precise, grounded answer strictly based on the FAQ data.  
+
+---
+
+## 🗂 Project Structure
+```bash
 nust-admission-assistant/
 │
 ├── data/
-│   └── faqs.json              # NUST FAQ Q&A pairs
+│ └── faqs.json # Official NUST FAQ Q&A pairs
 │
 ├── index/
-│   ├── faqs.index             # FAISS vector index
-│   └── faqs_texts.json        # raw text chunks
+│ ├── faqs.index # FAISS vector index
+│ └── faqs_texts.json # Raw text chunks for indexing
 │
-├── build_index.py             # builds FAISS index from faqs.json
-├── chatbot.py                 # RAG query engine
-├── app.py                     # Streamlit chat UI
+├── build_index.py # Script to build FAISS index from faqs.json
+├── chatbot.py # RAG query engine
+├── app.py # Streamlit-based chat UI
 └── requirements.txt
 ```
 
 ---
 
-## Tech stack
+## 🛠 Tech Stack
 
-| Component | Tool |
-|---|---|
-| LLM | qwen2.5:1.5b via Ollama (local, CPU) |
-| Embeddings | all-MiniLM-L6-v2 (sentence-transformers) |
-| Vector search | FAISS (faiss-cpu) |
-| UI | Streamlit |
-| Language | Python 3.14 |
+| Component       | Tool / Library |
+|-----------------|----------------|
+| Local LLM       | `qwen2.5:1.5b` via Ollama (CPU) |
+| Embeddings      | `all-MiniLM-L6-v2` (sentence-transformers) |
+| Vector Search   | FAISS (faiss-cpu) |
+| UI              | Streamlit |
+| Language        | Python 3.14 |
 
 ---
 
-## Setup
+## ⚡ Setup Instructions
 
-**1. Clone the repo**
+**1. Clone the repository**  
+
 ```bash
-git clone https://github.com/yourusername/nust-admission-assistant
-cd nust-admission-assistant
+git clone https://github.com/ajawad06/nust-admission-bot.git
+cd nust-admission-bot
 ```
 
 **2. Install dependencies**
+
 ```bash
 pip install -r requirements.txt
 ```
 
-**3. Pull the model**
+**3. Pull the local LLM**
+
 ```bash
 ollama pull qwen2.5:1.5b
 ```
 
-**4. Build the index**
+**4. Build the FAISS index**
+
 ```bash
 python build_index.py
 ```
 
-**5. Run the app**
+**5. Launch the Streamlit app**
+
 ```bash
 python -m streamlit run app.py
 ```
 
-Open **http://localhost:8501**
-
 ---
 
-## Hardware
+## 💻 Hardware Requirements
 
-- CPU: Intel Core i5 (no dedicated GPU)
-- RAM: 8GB
-- OS: Windows 11
-- 100% offline after setup
-
----
-
-## Competition
-
-Built for **Local Chatbot Competition 2026** — NUST Islamabad  
-Organized by Dr. Sohail Iqbal
+- CPU: Intel Core i5
+- RAM: Min. 8GB
+- OS: Windows 11 (or linux/macOS)
+- Fully offline after setup
 
 ---
-
-## License
-
-MIT
