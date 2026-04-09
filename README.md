@@ -1,4 +1,4 @@
-# NUST Admission Assistant
+# 🎓 NUST Admission Assistant
 
 **An offline, RAG-based chatbot built for the Local Chatbot Competition 2026 at NUST Islamabad, providing instant, accurate answers to all NUST admissions queries using official FAQ data.**  
 
@@ -94,7 +94,7 @@ python build_index.py
 python -m streamlit run app.py
 ```
 
-**6. Open your browser at: http://localhost:8501
+**6. Open your browser at: http://localhost:8501**
 
 ---
 
