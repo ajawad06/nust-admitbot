@@ -1,108 +1,122 @@
-# 🎓 NUST Admission Assistant
+# NUST Admission Assistant
 
-**An offline, RAG-based chatbot built for the Local Chatbot Competition 2026 at NUST Islamabad, providing instant, accurate answers to all NUST admissions queries using official FAQ data.**  
+An offline NUST admissions chatbot that runs locally on your machine. It uses official FAQ data, a local FAISS index, and a FastAPI backend with a plain HTML/CSS/JS frontend.
 
----
+## Overview
 
-## 🚀 Overview
+NUST Admission Assistant helps students get quick answers about:
 
-**NUST Admission Assistant** allows students to get instant, accurate answers about:
+- NET and admission procedures
+- Eligibility criteria
+- Scholarships and financial aid
+- Hostels and accommodation
+- Undergraduate programmes
+- Reserved seats and related admission policies
 
-- NET & admission procedures  
-- Eligibility criteria  
-- Scholarships & financial aid  
-- Hostels & accommodation  
-- Programmes & course details  
+The bot is designed to work without internet after setup. Normal FAQ questions are answered directly from the local FAQ data and semantic index, so responses are typically well under 10 seconds.
 
-All answers are **grounded in NUST's official FAQ data** - no internet, no cloud, no hallucinations.  
+## How It Works
 
----
+1. The student asks a question in the browser UI.
+2. The frontend sends the question to the local FastAPI backend at `/api/chat`.
+3. The chatbot first tries a fast direct/fuzzy FAQ match.
+4. If needed, it embeds the question with `all-MiniLM-L6-v2` and searches the offline FAISS index.
+5. The best local FAQ answer is returned with source chunks.
 
-## 💡 How It Works
-
-This project uses a **Retrieval-Augmented Generation (RAG)** pipeline:
-
-1. Student asks a question in the chat.  
-2. The question is embedded into a semantic vector.  
-3. **FAISS** searches the offline index for the 3 most relevant FAQ chunks.  
-4. These chunks are provided to a **local LLM (`qwen2.5:1.5b`)** as context.  
-5. The LLM generates a precise, grounded answer strictly based on the FAQ data.  
-
----
-
-## 🗂 Project Structure
-```bash
-nust-admission-bot/
-│
-├── data/
-│ └── faqs.json # Official NUST FAQ Q&A pairs
-│
-├── index/
-│ ├── faqs.index # FAISS vector index
-│ └── faqs_texts.json # Raw text chunks for indexing
-│
-├── build_index.py # Script to build FAISS index from faqs.json
-├── chatbot.py # RAG query engine
-├── app.py # Streamlit-based chat UI
-└── requirements.txt
-```
-
----
-
-## 🛠 Tech Stack
-
-| Component       | Tool / Library |
-|-----------------|----------------|
-| Local LLM       | `qwen2.5:1.5b` via Ollama (CPU) |
-| Embeddings      | `all-MiniLM-L6-v2` (sentence-transformers) |
-| Vector Search   | FAISS (faiss-cpu) |
-| UI              | Streamlit |
-| Language        | Python 3.14 |
-
----
-
-## ⚡ Setup Instructions
-
-**1. Clone the repository**  
+Ollama is no longer required for normal FAQ responses. It can still be enabled as an optional fallback by setting:
 
 ```bash
-git clone https://github.com/ajawad06/nust-admission-bot.git
-cd nust-admission-bot
+USE_OLLAMA_FALLBACK=1
 ```
 
-**2. Install dependencies**
+## Project Structure
+
+```text
+nust_admission_chatbot/
+|-- data/
+|   `-- faqs.json              # Official NUST FAQ Q&A pairs
+|-- index/
+|   |-- faqs.index             # FAISS vector index
+|   `-- faqs_texts.json        # Raw indexed FAQ chunks
+|-- static/
+|   |-- index.html             # Browser chat UI
+|   |-- styles.css             # Frontend styling
+|   `-- app.js                 # Frontend chat logic
+|-- app.py                     # FastAPI backend
+|-- chatbot.py                 # Local FAQ query engine
+|-- build_index.py             # Rebuilds the FAISS index
+`-- requirements.txt
+```
+
+## Tech Stack
+
+| Component | Tool / Library |
+| --- | --- |
+| Backend | FastAPI |
+| Frontend | HTML, CSS, JavaScript |
+| Embeddings | `all-MiniLM-L6-v2` via sentence-transformers |
+| Vector search | FAISS (`faiss-cpu`) |
+| Optional LLM fallback | `qwen2.5:1.5b` via Ollama |
+| Language | Python |
+
+## Setup
+
+1. Create and activate a virtual environment.
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+2. Install dependencies.
 
 ```bash
 pip install -r requirements.txt
 ```
 
-**3. Pull the local LLM**
-
-```bash
-ollama pull qwen2.5:1.5b
-```
-
-**4. Build the FAISS index**
+3. Build or rebuild the FAISS index if needed.
 
 ```bash
 python build_index.py
 ```
 
-**5. Launch the Streamlit app**
+4. Start the local FastAPI server.
 
 ```bash
-python -m streamlit run app.py
+python -m uvicorn app:app --host 127.0.0.1 --port 8000
 ```
 
-**6. Open your browser at: http://localhost:8501**
+5. Open the chatbot.
 
----
+```text
+http://127.0.0.1:8000/
+```
 
-## 💻 Hardware Requirements
+## API Endpoints
 
-- CPU: Intel Core i5
-- RAM: Min. 8GB
-- OS: Windows 11 (or linux/macOS)
-- Fully offline after setup
+| Endpoint | Method | Description |
+| --- | --- | --- |
+| `/` | GET | Serves the local chat UI |
+| `/api/health` | GET | Checks local backend status and FAQ count |
+| `/api/chat` | POST | Answers a question from local FAQ data |
 
----
+Example request:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/chat ^
+  -H "Content-Type: application/json" ^
+  -d "{\"question\":\"Are there any quota seats?\"}"
+```
+
+## Offline Notes
+
+- The FAQ data and FAISS index are stored locally.
+- The embedding model must already be available in the local Hugging Face cache.
+- The app sets offline Hugging Face environment flags in `chatbot.py` and `build_index.py`.
+- Internet is not required for normal chatbot use once dependencies, model files, and the index are present.
+
+## Performance
+
+The chatbot avoids calling a local LLM for normal FAQ answers. Direct FAQ matches are usually answered in a few milliseconds after startup, while semantic FAQ matches are typically far below the 10 second target.
+
+First startup can take a few seconds because the embedding model is loaded into memory.
