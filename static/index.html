@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NUST Admissions Assistant</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="chat-panel" aria-label="NUST admissions chatbot">
+        <header class="topbar">
+          <div class="brand-mark">N</div>
+          <div>
+            <h1>NUST Admissions Assistant</h1>
+            <p><span class="status-dot"></span> Offline local FAQ bot</p>
+          </div>
+        </header>
+
+        <div id="messages" class="messages" aria-live="polite">
+          <article class="message bot">
+            <div class="avatar">N</div>
+            <div class="bubble">
+              Welcome. Ask about NUST admissions, NET, eligibility, scholarships, reserved seats, or undergraduate programmes.
+            </div>
+          </article>
+        </div>
+
+        <form id="chat-form" class="composer" autocomplete="off">
+          <input
+            id="question"
+            name="question"
+            type="text"
+            maxlength="800"
+            placeholder="Ask about NET, UG admissions, scholarships..."
+            aria-label="Ask a question"
+            required
+          />
+          <button id="send-button" type="submit" aria-label="Send message">
+            <span>Send</span>
+          </button>
+        </form>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

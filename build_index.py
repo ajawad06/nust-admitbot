@@ -1,8 +1,14 @@
 """Build FAISS index from FAQ data for semantic search."""
 import json
+import os
 import numpy as np
 import faiss
 from pathlib import Path
+
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
+os.environ["HF_DATASETS_OFFLINE"] = "1"
+os.environ["HF_HUB_OFFLINE"] = "1"
+
 from sentence_transformers import SentenceTransformer
 
 DATA_FILE = Path("data/faqs.json")
@@ -37,7 +43,7 @@ for item in faqs:
 
 # STEP 3: Load embedding model
 try:
-    model = SentenceTransformer(MODEL_NAME)
+    model = SentenceTransformer(MODEL_NAME, local_files_only=True)
 except Exception as e:
     print(f"ERROR loading model: {e}")
     exit(1)
